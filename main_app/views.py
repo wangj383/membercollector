@@ -1,26 +1,31 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.views.generic.edit import CreateView,UpdateView,DeleteView
 
-# Create your views here.
-
-class Member:
-    def __init__ (self,name,position,email,phone,description):
-        self.name = name
-        self.position = position
-        self.email = email
-        self.phone = phone
-        self.description = description
-
-members = [
-    Member('Yvonne', 'Founder', 'yvonnewjy@hotmail.com', '416-000-0000', 'Love singing and watch drama'),
-    Member('XYZ', 'Member', 'member@hotmail.com', '100-000-0000', 'Love food' )
-]
+from .models import Member
+from .forms import TaskForm
 
 def home(request):
-    return HttpResponse('<h1>Hellow</h1>')
+    return render(request, 'home.html')
 
 def about(request):
     return render(request, 'about.html')
 
 def members_index(request):
+    members = Member.objects.all()
     return render(request, 'members/index.html', {'members': members})
+
+def member_detail(request, member_id):
+    member = Member.objects.get(id=member_id)
+    return render(request, 'members/detail.html', {'member': member, 'taskform': TaskForm()})
+
+class MemberCreateView(CreateView):
+    model = Member
+    fields = '__all__'
+
+class MemberUpdateView(UpdateView):
+    model = Member
+    fields = ['birthday','position','email','phone','description']
+
+class MemberDeleteView(DeleteView):
+    model = Member
+    success_url = '/members/'

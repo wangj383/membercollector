@@ -5,13 +5,16 @@
 
 {% for member in members %}
   <div class="card">
-    <div class="card-content">
-      <span class="card-title">{{ member.name }}</span>
-      <p>Position/Role: {{ member.position }}</p>
-      <p>Email: {{ member.email }}</p>
-      <p>Phone: {{ member.phone }}</p>
-      <p>Description: {{ member.description }}</p>
-    </div>
+    <a href="{% url 'member_detail' member.id %}">
+      <div class="card-content">
+        <span class="card-title">{{ member.name }}</span>
+        <p>Age: {{ member.age }}</p>
+        <p>Position/Role: {{ member.position }}</p>
+        <p>Email: {{ member.email }}</p>
+        <p>Phone: {{ member.phone }}</p>
+        <p>Description: {{ member.description }}</p>
+      </div>
+    </a>
   </div>
 {% endfor %}
 

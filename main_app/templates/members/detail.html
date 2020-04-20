@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{member.name}}</h1>
+<div class='row'>
+    <div class='col s6'>
+        <div class="card">
+            <div class="card-content">
+                <!-- <span class="card-title">{{ member.name }}</span> -->
+                {% if member.age %}
+                    <p>Age: {{ member.age }}</p>
+                {% endif %}
+                <p>Position/Role: {{ member.position }}</p>
+                <p>Email: {{ member.email }}</p>
+                <p>Phone: {{ member.phone }}</p>
+                <p>Description: {{ member.description }}</p>
+                <div class='card-action'>
+                    <a href="{% url 'member_update' member.id %}">Edit</a>
+                    <a href="{% url 'member_delete' member.id %}">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col s6">
+        <form method="post">
+            {% csrf_token %}
+            {{ taskform.as_p }}
+            <input type="submit" class="btn" value="Add Task">
+        </form>
+        <table class="striped">
+            <thead>
+                <tr><th>Date</th><th>Task</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for task in member.task_set.all %}
+                <tr>
+                    <td>{{task.date}}</td>
+                    <td>{{task.task}}</td>
+                    <td>{{task.get_status_display}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    var dateEl = document.getElementById('id_date');
+    M.Datepicker.init(dateEl, {
+      format: 'yyyy-mm-dd',
+      defaultDate: new Date(),
+      setDefaultDate: true,
+      autoClose: true
+    });
+  
+    // add additional JS to initialize select below
+    var selectEl = document.getElementById('id_status');
+    M.FormSelect.init(selectEl);
+</script>
+{% endblock %}
