@@ -18,9 +18,16 @@
           <li><a href="/" class="left brand-logo">&nbsp;&nbsp;Team Member List</a></li>
         </ul>
         <ul class="right">
+          
           <li><a href="{% url 'about' %}">About</a></li>
-          <li><a href="{% url 'members_index' %}">View All Members' Information</a></li>
-          <li><a href="{% url 'member_create' %}">Add a Member</a></li>
+          {% if user.is_authenticated %}
+            <li><a href="{% url 'members_index' %}">View All Members</a></li>
+            <li><a href="{% url 'member_create' %}">Add Your Information</a></li>
+            <li><a href="{% url 'logout' %}">Log Out</a></li>
+          {% else %}
+            <li><a href="{% url 'signup' %}">Sign Up</a></li>
+            <li><a href="{% url 'login' %}">Log In</a></li>
+          {% endif %}
         </ul>
       </div>
     </nav>

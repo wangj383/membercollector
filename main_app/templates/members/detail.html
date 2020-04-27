@@ -13,22 +13,55 @@
                 <p>Email: {{ member.email }}</p>
                 <p>Phone: {{ member.phone }}</p>
                 <p>Description: {{ member.description }}</p>
+                <br />
+                {% if member.user == request.user %}
                 <div class='card-action'>
                     <a href="{% url 'member_update' member.id %}">Edit</a>
                     <a href="{% url 'member_delete' member.id %}">Delete</a>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
+    {% if member.user == request.user %}
     <div class="col s6">
-        <form method="post">
+        <form action="{% url 'add_task' member.id %}" method="post">
             {% csrf_token %}
-            {{ taskform.as_p }}
+            {{ taskform.as_table }}
             <input type="submit" class="btn" value="Add Task">
         </form>
+    </div>
+    {% endif %}
+</div>
+<div class='row'>
+    <div class='col s6'>
+        {% for photo in member.photo_set.all %}
+            <img class='responsive-img card-panel' src='{{photo.url}}'>
+        {% empty %}
+            <div class='card-panel red-text center-align'>No Photos Uploaded</div>
+        {% endfor %}
+        {% if member.user == request.user %}
+        <form action="{% url 'add_photo' member.id %}" enctype="multipart/form-data" method="POST" class="card-panel">
+            {% csrf_token %}
+            <input type="file" name="photo-file">
+            <br><br>
+            <input type="submit" class="btn" value="Upload Photo">
+        </form>
+        {% endif %}
+    </div>
+    <div class='col s6'>
+        {% if member.user == request.user %}
+            {% if member.daily_progress %}
+                <div class="card-panel teal-text center-align">Thank you for your updates!</div>
+            {% else %}
+                <div class="card-panel red-text center-align">Any updates for today?</div>
+            {% endif %}
+        {% endif %}
         <table class="striped">
             <thead>
-                <tr><th>Date</th><th>Task</th><th>Status</th></tr>
+                {% if member.task_set.all %}
+                    <tr><th>Date</th><th>Task</th><th>Status</th></tr>
+                {% endif %}
             </thead>
             <tbody>
                 {% for task in member.task_set.all %}
@@ -41,6 +74,61 @@
             </tbody>
         </table>
     </div>
+</div>
+<div class='row'>
+    <div class='col s6'>
+        <h4>Events Attended</h4>
+        {% if member.event.count %}
+            {% for event in member.event.all %}
+                <div class="card">
+                    <div class='card-content'>
+                        <div class='card-title'>
+                            {{event.name}}
+                        </div>
+                        <div class='card-content'>
+                            <p>Date: {{event.date}}</p>
+                            <p>Place: {{event.place}}</p>
+                        </div>
+                        {% if member.user == request.user %}
+                        <div class='card-action'>
+                            <a href="{% url 'unassociate_event' member.id event.id %}">Remove</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <h5>Have not attended any event yet</h5>
+        {% endif %}
+    </div>
+    {% if member.user == request.user %}
+    <div class='col s6'>
+        <h4>Available Events</h4>
+        {% if events.count %}
+            {% for event in events.all %}
+                <div class="card">
+                    <div class='card-content'>
+                        <div class='card-title'>
+                            {{event.name}}
+                        </div>
+                        <div class='card-content' >
+                            <p>Date: {{event.date}}</p>
+                            <p>Place: {{event.place}}</p>
+                        </div>
+                    </div>
+                    <div class="card-action">
+                        <form action="{% url 'associate_event' member.id event.id %}" method="post">
+                          {% csrf_token %}
+                          <button type="submit" class="btn">Add</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <h5>{{member.name}} has already atteneded all the events</h5>
+        {% endif %}
+    </div>
+    {% endif %}
 </div>
 <script>
     var dateEl = document.getElementById('id_date');
